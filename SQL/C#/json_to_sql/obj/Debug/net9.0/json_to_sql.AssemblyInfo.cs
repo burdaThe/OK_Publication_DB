@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("json_to_sql")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc43fe86664ff9f78ca8d1f290c5f47fbf9ff0ae")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb912bd7e9edc543ff6bb31ee20ca535842c54bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("json_to_sql")]
 [assembly: System.Reflection.AssemblyTitleAttribute("json_to_sql")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
