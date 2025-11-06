@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+/SQL/C\#/json_to_sql/.vs
+
+.idea/
