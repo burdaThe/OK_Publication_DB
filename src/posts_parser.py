@@ -19,25 +19,30 @@ with sync_playwright() as p:
     page = context.new_page()
     page.goto(url, wait_until="networkidle", timeout=60000)
 
+    links = []
     for i in range(1, n * 3 + 1):
         page.wait_for_timeout(2000)
         page.mouse.wheel(0, 1000)
 
-    page.wait_for_timeout(5000)
+        page.wait_for_timeout(2000)
 
-    html = page.content()
+        html = page.content()
 
-    with open("ok_search.html", "w", encoding="utf-8") as f:
-        f.write(html)
+        with open("ok_search.html", "w", encoding="utf-8") as f:
+            f.write(html)
 
-    pattern = re.compile(
-        r'<a\b(?=[^>]*\bclass="[^"]*\bmedia-text_a\b[^"]*")'
-        r'(?=[^>]*\baria-label="Открыть топик")'
-        r'[^>]*\bhref="([^"]+)"',
-        re.IGNORECASE | re.DOTALL
-    )
+        pattern = re.compile(
+            r'<a\b(?=[^>]*\bclass="[^"]*\bmedia-text_a\b[^"]*")'
+            r'(?=[^>]*\baria-label="Открыть топик")'
+            r'[^>]*\bhref="([^"]+)"',
+            re.IGNORECASE | re.DOTALL
+        )
 
-    links = pattern.findall(html)
+        links_scroll = pattern.findall(html)
+        for i in links_scroll:
+            links.append(i)
+
+    print("Найдено ссылок:", len(links))
     print("Найдено ссылок:", len(links))
     for l in links[:5]:
         print(l)
