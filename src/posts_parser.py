@@ -43,7 +43,6 @@ with sync_playwright() as p:
             links.append(i)
 
     print("Найдено ссылок:", len(links))
-    print("Найдено ссылок:", len(links))
     for l in links[:5]:
         print(l)
 
