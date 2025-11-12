@@ -4,7 +4,7 @@ import re
 import time
 
 URL = "https://ok.ru/dk?st.cmd=searchResult&st.mode=Content&st.query=чай"
-n = 4
+n = 5
 
 def save_json(data, name = "output.json"):
     with open(name, "w", encoding="utf8") as outfile:
@@ -79,14 +79,13 @@ def page_data_retrieve(link, context):
     else:
         shared = 0
 
-    page_content = [
-        {"group_name": group_name,
-         "date": date,
+    page_content = {"group_name": group_name[0],
+         "date": date[0],
          "text": text,
          "num_likes": likes,
          "num_comments": comments,
          "num_shared": shared
-         }]
+         }
     return page_content
 
 def main():
