@@ -9,9 +9,11 @@ SEARCH_TARGET = 'чай'
 MAIN_DOMEN_URL = 'https://ok.ru'
 URL = f'{MAIN_DOMEN_URL}/dk?st.cmd=searchResult&st.mode=Content&st.query={SEARCH_TARGET}'
 
-def save_json(data, name = "output.json"):
+
+def save_json(data, name="output.json"):
     with open(name, "w", encoding="utf8") as outfile:
         json.dump(data, outfile, indent=4, ensure_ascii=False)
+
 
 def link_data_retrieve(link, context):
     try:
@@ -53,7 +55,7 @@ def link_data_retrieve(link, context):
                 if line:
                     clean_lines.append(line)
 
-        text = "\n".join(clean_lines)
+        text = ". ".join(clean_lines)
 
         likes_pattern = re.compile(
             r'<span[^>]*data-msg="reactedWithCount"[^>]*>(.*?)</span>',
@@ -96,6 +98,7 @@ def link_data_retrieve(link, context):
     except Exception as e:
         print(f"Extracting data from page error: {e}")
 
+
 def get_links_from_page(page):
     links = []
     while len(links) < n:
@@ -121,6 +124,7 @@ def get_links_from_page(page):
 
     return links
 
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
@@ -141,7 +145,7 @@ def main():
 
             for i in range(0, n):
                 print(links[i])
-                page_content=link_data_retrieve(links[i], context)
+                page_content = link_data_retrieve(links[i], context)
                 print(page_content)
                 content.append(page_content)
 

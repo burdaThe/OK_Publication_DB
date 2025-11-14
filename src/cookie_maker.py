@@ -15,7 +15,7 @@ with sync_playwright() as p:
     page = context.new_page()
     page.goto(url)
 
-    time.sleep(60)
+    time.sleep(30)
 
     cookies = context.cookies()
     with open("ok_cookies.json", "w", encoding="utf-8") as f:
