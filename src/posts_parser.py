@@ -83,13 +83,15 @@ def link_data_retrieve(link, context):
         else:
             shared = 0
 
-        page_content = {"group_name": group_name[0],
-             "date": date[0],
-             "text": text,
-             "num_likes": likes,
-             "num_comments": comments,
-             "num_shared": shared
-             }
+        page_content = {
+            "link": link,
+            "group_name": group_name[0],
+            "date": date[0],
+            "text": text,
+            "num_likes": likes,
+            "num_comments": comments,
+            "num_shared": shared
+        }
         return page_content
     except Exception as e:
         print(f"Extracting data from page error: {e}")
@@ -99,7 +101,6 @@ def get_links_from_page(page):
     while len(links) < n:
         page.wait_for_timeout(800)
         page.mouse.wheel(0, 1000)
-
         page.wait_for_timeout(200)
 
         html = page.content()
@@ -142,7 +143,7 @@ def main():
                 print(links[i])
                 page_content=link_data_retrieve(links[i], context)
                 print(page_content)
-                content.append({"link" : links[i], "content" : page_content})
+                content.append(page_content)
 
             browser.close()
             save_json(content)
@@ -152,7 +153,7 @@ def main():
         except FileNotFoundError as e:
             print(f"Not found file: {e.filename}")
         except Exception as e:
-            print(f"Unknown error: {e}")
+            print(f"Unknown error in main: {e}")
 
 if __name__ == "__main__":
     start = time.time()
