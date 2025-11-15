@@ -6,7 +6,7 @@ class Program
     { 
         // Импорт данных из JSON в SQLite
         var importer = new JsonToSqliteImporter();
-        importer.ImportFromJsonFile("C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\JSONS\\Test.json");
+        importer.ImportFromJsonFile("C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\JSONS\\output.json");
     }
 
 }
