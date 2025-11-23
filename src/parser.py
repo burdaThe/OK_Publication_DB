@@ -1,7 +1,7 @@
 from typing import Dict
 from playwright.sync_api import Page, BrowserContext
 from config import Config
-from src.errors import SearchError
+from src.errors import SearchError, ParsePostError
 import re
 
 
@@ -41,7 +41,7 @@ class PostParser:
                     return list(links)[:self.config.n_posts]
 
             if len(links) == 0:
-                raise SearchError('Search error. Found 0 posts. Might be too specific search target.')
+                raise SearchError('Search error. Found 0 posts. Search target might be too specific.')
 
     @staticmethod
     def parse_post(link: str, context: BrowserContext) -> str:
@@ -50,10 +50,14 @@ class PostParser:
         page.goto(f'{'https://ok.ru'}{link}', wait_until="networkidle", timeout=60000)
         post_html = page.content()
 
+        if len(post_html) == 0:
+            raise ParsePostError('https://ok.ru' + link)
+
         return post_html
 
     @staticmethod
     def extract_data(post_html: str, link: str) -> Dict:
+        """Extract data from post."""
         group_name_pattern = re.compile(
             r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
             re.DOTALL | re.IGNORECASE
@@ -127,4 +131,11 @@ class PostParser:
             "num_comments": comments,
             "num_shared": shared
         }
+
+        str_content = ['link', 'group_name', 'date']
+        for key, value in page_content:
+            if key in str_content:
+                if len(value) == 0:
+                    print(f'Warning! Unknown behavior for {key} in https://ok.ru{link}')
+
         return page_content

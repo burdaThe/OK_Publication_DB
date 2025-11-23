@@ -41,3 +41,13 @@ class ParserError(Exception):
 
 class SearchError(ParserError):
     """Search error. No posts found."""
+
+
+class ParsePostError(ParserError):
+    """Post parsing error."""
+
+    def __init__(self, link):
+        self.link = link
+
+    def __str__(self):
+        return f'Post parsing error. Cannot parse {self.link}'
