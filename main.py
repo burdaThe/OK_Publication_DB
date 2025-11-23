@@ -1,6 +1,4 @@
 import os.path
-import sys
-from typing import List, Dict
 from config import Config
 from src.browser import BrowserManager
 from src.parser import PostParser
@@ -9,7 +7,7 @@ from src.auth import Authentication
 
 
 def main():
-    config = Config('Чай', 5, False)
+    config = Config('чай', 5, False)
     with BrowserManager(config) as browser:
         if not os.path.exists('ok_cookies.json'):
             auth = Authentication(config)
