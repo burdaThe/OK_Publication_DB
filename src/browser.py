@@ -11,7 +11,7 @@ class BrowserManager:
         self.browser = None
         self.context: Optional[BrowserContext] = None
 
-    def setup(self) -> BrowserContext:
+    def setup(self):
         """Initialize browser and context."""
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.chromium.launch(
@@ -22,9 +22,9 @@ class BrowserManager:
                        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
             locale="ru-RU"
         )
-        self._load_cookies()
+        # self._load_cookies()
 
-        return self.context
+        return self
 
     def _load_cookies(self):
         """Load cookies into the context."""
@@ -42,7 +42,7 @@ class BrowserManager:
         self.browser.close()
 
     def __enter__(self):
-        self.setup()
+        return self.setup()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()

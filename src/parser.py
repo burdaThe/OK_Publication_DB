@@ -8,13 +8,17 @@ class PostParser:
     def __init__(self, config: Config):
         self.config = config
 
-    def extract_links(self, page: Page) -> List[str]:
+    def extract_links(self, page: Page):
         """Extract post links."""
-        links = []
-        while len(links) < self.config.n_posts:
-            page.wait_for_timeout(800)
-            page.mouse.wheel(0, 1000)
-            page.wait_for_timeout(200)
+
+        links = set()
+        page.goto(self.config.search_url)
+
+        while True:
+            if len(links) >= self.config.n_posts:
+                return list(links)[:self.config.n_posts]
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(1000)
 
             html = page.content()
 
@@ -29,12 +33,14 @@ class PostParser:
             )
 
             links_scroll = pattern.findall(html)
-            for i in links_scroll:
-                links.append(i)
 
-        return links
+            for link in links_scroll:
+                links.add(link)
+                if len(links) >= self.config.n_posts:
+                    return list(links)[:self.config.n_posts]
 
-    def parse_post(self, link: str, context: BrowserContext):
+    @staticmethod
+    def parse_post(link: str, context: BrowserContext):
         """Extract post HTML."""
         page = context.new_page()
         page.goto(f'{'https://ok.ru'}{link}', wait_until="networkidle", timeout=60000)
@@ -42,7 +48,8 @@ class PostParser:
 
         return post_html
 
-    def _extract_data(self, post_html, link) -> Dict:
+    @staticmethod
+    def extract_data(post_html, link) -> Dict:
         group_name_pattern = re.compile(
             r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
             re.DOTALL | re.IGNORECASE
@@ -117,5 +124,3 @@ class PostParser:
             "num_shared": shared
         }
         return page_content
-
-
