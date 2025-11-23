@@ -1,6 +1,7 @@
-from typing import List, Dict, Optional
+from typing import Dict
 from playwright.sync_api import Page, BrowserContext
 from config import Config
+from src.errors import SearchError
 import re
 
 
@@ -39,8 +40,11 @@ class PostParser:
                 if len(links) >= self.config.n_posts:
                     return list(links)[:self.config.n_posts]
 
+            if len(links) == 0:
+                raise SearchError('Search error. Found 0 posts. Might be too specific search target.')
+
     @staticmethod
-    def parse_post(link: str, context: BrowserContext):
+    def parse_post(link: str, context: BrowserContext) -> str:
         """Extract post HTML."""
         page = context.new_page()
         page.goto(f'{'https://ok.ru'}{link}', wait_until="networkidle", timeout=60000)
@@ -49,7 +53,7 @@ class PostParser:
         return post_html
 
     @staticmethod
-    def extract_data(post_html, link) -> Dict:
+    def extract_data(post_html: str, link: str) -> Dict:
         group_name_pattern = re.compile(
             r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
             re.DOTALL | re.IGNORECASE

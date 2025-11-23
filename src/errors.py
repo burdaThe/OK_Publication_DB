@@ -3,6 +3,15 @@ class BrowserError(Exception):
     pass
 
 
+class InvalidCookiePath(BrowserError):
+    """Invalid Cookie path."""
+    def __init__(self, cookies_path):
+        self.cookies_path = cookies_path
+
+    def __str__(self):
+        return f'Invalid cookies path: {self.cookies_path}'
+
+
 class ConfigError(Exception):
     """Base confid error."""
     pass
@@ -24,3 +33,11 @@ class InvalidSearchTargetLength(ConfigError):
 
     def __str__(self):
         return f'Invalid search target length. Got {self.length}. Expected > 0.'
+
+
+class ParserError(Exception):
+    """Base parser error."""
+
+
+class SearchError(ParserError):
+    """Search error. No posts found."""

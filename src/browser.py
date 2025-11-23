@@ -1,7 +1,8 @@
 from playwright.sync_api import BrowserContext, Page, sync_playwright
-from typing import Optional
 import json
 from config import Config
+from src.errors import InvalidCookiePath
+import os.path
 
 
 class BrowserManager:
@@ -9,7 +10,7 @@ class BrowserManager:
         self.config = config
         self.playwright = None
         self.browser = None
-        self.context: Optional[BrowserContext] = None
+        self.context: BrowserContext | None = None
 
     def setup(self):
         """Initialize browser and context."""
@@ -28,6 +29,9 @@ class BrowserManager:
 
     def _load_cookies(self):
         """Load cookies into the context."""
+        if not os.path.exists(self.config.cookies_path):
+            raise InvalidCookiePath(self.config.cookies_path)
+
         with open(self.config.cookies_path, 'r', encoding='utf-8') as f:
             cookies = json.load(f)
         self.context.add_cookies(cookies)
