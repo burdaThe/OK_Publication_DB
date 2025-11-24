@@ -59,84 +59,121 @@ class PostParser:
     def extract_data(post_html: str, link: str) -> Dict:
         """Extract data from post."""
         print(f'Extracting data from the https://ok.ru{link}')
-        group_name_pattern = re.compile(
-            r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
-            re.DOTALL | re.IGNORECASE
-        )
-        group_name = group_name_pattern.findall(post_html)
+        try:
+            group_name_pattern = re.compile(
+                r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
+                re.DOTALL | re.IGNORECASE
+            )
+            group_name = group_name_pattern.findall(post_html)
+            if len(group_name) == 0:
+                group_name_pattern = re.compile(
+                    r'<div\s+class="user-name__vqfx6"\s*>(.*?)</div>',
+                    re.DOTALL | re.IGNORECASE
+                )
+                group_name = group_name_pattern.findall(post_html)
 
-        date_pattern = re.compile(
-            r'<time[^>]*>(.*?)</time>',
-            re.DOTALL | re.IGNORECASE
-        )
-        date = date_pattern.findall(post_html)
+            date_pattern = re.compile(
+                r'<time[^>]*>(.*?)</time>',
+                re.DOTALL | re.IGNORECASE
+            )
+            date = date_pattern.findall(post_html)
 
-        block_pattern = re.compile(
-            r'<div[^>]*class="media-text_cnt_tx[^"]*"[^>]*>(.*?)</div>',
-            re.DOTALL | re.IGNORECASE
-        )
-        blocks = block_pattern.findall(post_html)
-        texts = []
+            block_pattern = re.compile(
+                r'<div[^>]*class="media-text_cnt_tx[^"]*"[^>]*>(.*?)</div>',
+                re.DOTALL | re.IGNORECASE
+            )
+            blocks = block_pattern.findall(post_html)
+            texts = []
 
-        for block in blocks:
-            block = re.sub(r'<img[^>]*>', '', block)
-            block = re.sub(r'<[^>]+>', '', block)
-            clean = block.strip()
+            for block in blocks:
+                block = re.sub(r'<img[^>]*>', '', block)
+                block = re.sub(r'<[^>]+>', '', block)
+                clean = block.strip()
 
-            if clean:
-                texts.append(clean)
+                if clean:
+                    texts.append(clean)
 
-        clean_lines = []
-        for t in texts:
-            for line in t.split("\n"):
-                line = line.strip()
-                if line:
-                    clean_lines.append(line)
+            clean_lines = []
+            for t in texts:
+                for line in t.split("\n"):
+                    line = line.strip()
+                    if line:
+                        clean_lines.append(line)
 
-        text = ". ".join(clean_lines)
+            text = ". ".join(clean_lines)
 
-        likes_pattern = re.compile(
-            r'<span[^>]*data-msg="reactedWithCount"[^>]*>(.*?)</span>',
-            re.IGNORECASE | re.DOTALL
-        )
-        likes_matches = likes_pattern.findall(post_html)
-        if likes_matches:
-            m = re.search(r'\d+', likes_matches[0])
-            likes = int(m.group(0)) if m else 0
-        else:
-            likes = 0
+            likes_pattern = re.compile(
+                r'<span[^>]*data-msg="reactedWithCount"[^>]*>(.*?)</span>',
+                re.IGNORECASE | re.DOTALL
+            )
+            likes_matches = likes_pattern.findall(post_html)
+            if likes_matches:
+                m = re.search(r'\d+', likes_matches[0])
+                likes = int(m.group(0)) if m else 0
+            else:
+                likes = 0
 
-        comments_pattern = re.compile(
-            r'<span[^>]*class="[^"]*\blstp-t\b[^"]*\bcomments-counter\b[^"]*"[^>]*>(.*?)</span>',
-            re.IGNORECASE | re.DOTALL
-        )
-        m = comments_pattern.findall(post_html)
-        comments = int(re.search(r'\d+', m[0]).group(0)) if m else 0
-        shared_pattern = re.compile(
-            r'<span[^>]*data-parent-class="feed_info_sm"[^>]*>(.*?)</span>',
-            re.IGNORECASE | re.DOTALL
-        )
-        shared_matches = shared_pattern.findall(post_html)
-        if shared_matches:
-            num_match = re.search(r'\d+', shared_matches[0])
-            shared = int(num_match.group(0)) if num_match else 0
-        else:
-            shared = 0
+            comments_pattern = re.compile(
+                r'<span[^>]*class="[^"]*\blstp-t\b[^"]*\bcomments-counter\b[^"]*"[^>]*>(.*?)</span>',
+                re.IGNORECASE | re.DOTALL
+            )
+            m = comments_pattern.findall(post_html)
+            comments = int(re.search(r'\d+', m[0]).group(0)) if m else 0
+            shared_pattern = re.compile(
+                r'<span[^>]*data-parent-class="feed_info_sm"[^>]*>(.*?)</span>',
+                re.IGNORECASE | re.DOTALL
+            )
+            shared_matches = shared_pattern.findall(post_html)
+            if shared_matches:
+                num_match = re.search(r'\d+', shared_matches[0])
+                shared = int(num_match.group(0)) if num_match else 0
+            else:
+                shared = 0
 
-        page_content = {
-            "link": link,
-            "group_name": group_name[0],
-            "date": date[0],
-            "text": text,
-            "num_likes": likes,
-            "num_comments": comments,
-            "num_shared": shared
-        }
+            for el in [group_name[0], date[0]]:
+                if not el or any(len(v) == 0 for v in el):
+                    print(f'Warning! Unknown behavior for {el} in https://ok.ru{link}')
 
-        str_content = ['link', 'group_name', 'date']
-        for key, value in page_content.items():
-            if key in str_content:
-                if not value or any(len(v) == 0 for v in value):
-                    print(f'Warning! Unknown behavior for {key} in https://ok.ru{link}')
+            page_content = {
+                "link": link,
+                "group_name": group_name[0],
+                "date": PostParser.format_data(date[0]),
+                "text": text,
+                "num_likes": likes,
+                "num_comments": comments,
+                "num_shared": shared
+            }
+
+            # str_content = ['link', 'group_name', 'date']
+            # for key, value in page_content.items():
+            #     if key in str_content:
+            #         if not value or any(len(v) == 0 for v in value):
+            #             print(f'Warning! Unknown behavior for {key} in https://ok.ru{link}')
+        except Exception as e:
+            raise Exception(f'Error happened when extracting https://ok.ru{link}. {e}')
 
         return page_content
+
+    @staticmethod
+    def format_data(data: str):
+        day, month, year = '', '', ''
+        data = data.split(' ')
+
+        day = data[0]
+        if len(day) == 1:
+            day = '0' + day
+
+        if len(data) > 2:
+            year = data[-1]
+        else:
+            year = '2025'
+        months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
+        for i, m in enumerate(months, start=1):
+            if data[1] == m:
+                month = i
+
+        return f'{day}.{month}.{year}'
+
+
+
+
