@@ -12,6 +12,15 @@ class InvalidCookiePath(BrowserError):
         return f'Invalid cookies path: {self.cookies_path}'
 
 
+class BrowserSetupError(BrowserError):
+    """Failed to load browser."""
+    pass
+
+
+class PageCreationError(BrowserError):
+    """Failed to create a new page."""
+
+
 class ConfigError(Exception):
     """Base confid error."""
     pass
@@ -37,10 +46,12 @@ class InvalidSearchTargetLength(ConfigError):
 
 class ParserError(Exception):
     """Base parser error."""
+    pass
 
 
 class SearchError(ParserError):
     """Search error. No posts found."""
+pass
 
 
 class ParsePostError(ParserError):
@@ -51,3 +62,13 @@ class ParsePostError(ParserError):
 
     def __str__(self):
         return f'Post parsing error. Cannot parse {self.link}'
+
+
+class SaveJsonError(Exception):
+    """Failed to save JSON."""
+    pass
+
+
+class CookiesSaveError(Exception):
+    """Failed to save cookies."""
+    pass

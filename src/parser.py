@@ -11,7 +11,7 @@ class PostParser:
 
     def extract_links(self, page: Page):
         """Extract post links."""
-
+        print('Extracting links for posts.')
         links = set()
         page.goto(self.config.search_url)
 
@@ -58,6 +58,7 @@ class PostParser:
     @staticmethod
     def extract_data(post_html: str, link: str) -> Dict:
         """Extract data from post."""
+        print(f'Extracting data from the https://ok.ru{link}')
         group_name_pattern = re.compile(
             r'<div\s+class="group-name__63bs8"\s*>(.*?)</div>',
             re.DOTALL | re.IGNORECASE
@@ -133,9 +134,9 @@ class PostParser:
         }
 
         str_content = ['link', 'group_name', 'date']
-        for key, value in page_content:
+        for key, value in page_content.items():
             if key in str_content:
-                if len(value) == 0:
+                if not value or any(len(v) == 0 for v in value):
                     print(f'Warning! Unknown behavior for {key} in https://ok.ru{link}')
 
         return page_content

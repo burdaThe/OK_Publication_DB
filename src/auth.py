@@ -1,6 +1,6 @@
 from playwright.sync_api import BrowserContext
+from src.errors import CookiesSaveError
 import json
-import time
 from config import Config
 
 
@@ -10,15 +10,18 @@ class Authentication:
 
     def create_cookies(self, context: BrowserContext) -> None:
         """Create cookies. User needs to log in."""
-
+        print('Log in your account and close the browser.')
         page = context.new_page()
         page.goto('https://ok.ru/')
 
-        time.sleep(30)
+        page.wait_for_event("close")
 
         cookies = context.cookies()
         if not cookies:
             raise Exception("Couldn't get cookies after authentication.")
 
-        with open(self.config.cookies_path, "w", encoding="utf-8") as f:
-            json.dump(cookies, f, ensure_ascii=False, indent=2)
+        try:
+            with open(self.config.cookies_path, "w", encoding="utf-8") as f:
+                json.dump(cookies, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            raise CookiesSaveError(f'Failed to save cookies to {self.config.cookies_path}. {e}')

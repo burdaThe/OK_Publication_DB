@@ -9,6 +9,7 @@ from src.auth import Authentication
 def main():
     config = Config('чай', 5, False)
     with BrowserManager(config) as browser:
+
         if not os.path.exists('ok_cookies.json'):
             auth = Authentication(config)
             auth.create_cookies(browser.context)
@@ -18,21 +19,16 @@ def main():
         page = browser.create_page()
         parser = PostParser(config)
         links = parser.extract_links(page)
-        print(len(links), sep='\n')
+
         content = []
         for link in links:
             post_html = parser.parse_post(link, browser.context)
             content.append(parser.extract_data(post_html, link))
 
-        print(len(content), content[0])
+        print(f'Parsed {len(links)} posts. Saved to {config.output_path}')
 
-        save_json(content, 'content.json')
+        save_json(content, config.output_path)
 
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
