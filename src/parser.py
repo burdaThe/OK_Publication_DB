@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from time import strftime
 from playwright.sync_api import Page, BrowserContext
 from config import Config
@@ -10,7 +10,7 @@ class PostParser:
     def __init__(self, config: Config):
         self.config = config
 
-    def extract_links(self, page: Page):
+    def extract_links(self, page: Page) -> List[str]:
         """Extract post links."""
         print('Extracting links for posts.')
         links = set()
@@ -57,7 +57,7 @@ class PostParser:
         return post_html
 
     @staticmethod
-    def extract_data(post_html: str, link: str) -> Dict:
+    def extract_data(post_html: str, link: str, config: Config) -> Dict:
         """Extract data from post."""
         print(f'Extracting data from the https://ok.ru{link}')
         try:
@@ -136,27 +136,23 @@ class PostParser:
                     print(f'Warning! Unknown behavior for {el} in https://ok.ru{link}')
 
             page_content = {
-                "link": link,
+                "link": 'https://ok.ru' + link,
                 "group_name": group_name[0],
                 "date": PostParser.format_data(date[0]),
                 "text": text,
                 "num_likes": likes,
                 "num_comments": comments,
-                "num_shared": shared
+                "num_shared": shared,
+                "keyword": config.search_target
             }
 
-            # str_content = ['link', 'group_name', 'date']
-            # for key, value in page_content.items():
-            #     if key in str_content:
-            #         if not value or any(len(v) == 0 for v in value):
-            #             print(f'Warning! Unknown behavior for {key} in https://ok.ru{link}')
         except Exception as e:
             raise Exception(f'Error happened when extracting https://ok.ru{link}. {e}')
 
         return page_content
 
     @staticmethod
-    def format_data(data: str):
+    def format_data(data: str) -> str:
         day, month, year = '', '', ''
         data = data.split(' ')
 
@@ -176,9 +172,7 @@ class PostParser:
             for i, m in enumerate(months, start=1):
                 if data[1] == m:
                     month = i
+                    if month < 10:
+                        month = '0' + str(month)
 
         return f'{day}.{month}.{year}'
-
-
-
-

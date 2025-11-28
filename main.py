@@ -14,7 +14,7 @@ def main():
             auth = Authentication(config)
             auth.create_cookies(browser.context)
 
-        browser._load_cookies()
+        browser.load_cookies()
 
         page = browser.create_page()
         parser = PostParser(config)
@@ -23,7 +23,7 @@ def main():
         content = []
         for link in links:
             post_html = parser.parse_post(link, browser.context)
-            content.append(parser.extract_data(post_html, link))
+            content.append(parser.extract_data(post_html, link, config))
 
         print(f'Parsed {len(links)} posts. Saved to {config.output_path}')
 
@@ -32,4 +32,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

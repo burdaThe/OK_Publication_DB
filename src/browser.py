@@ -31,7 +31,7 @@ class BrowserManager:
         print('Successfully set up the browser.')
         return self
 
-    def _load_cookies(self):
+    def load_cookies(self) -> None:
         """Load cookies into the context."""
         print('Loading cookies...')
         if not os.path.exists(self.config.cookies_path):
