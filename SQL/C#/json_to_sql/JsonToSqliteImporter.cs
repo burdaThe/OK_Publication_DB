@@ -22,19 +22,19 @@ namespace json_to_sql
             createTableCommand.CommandText = @"
             CREATE TABLE IF NOT EXISTS posts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                keyword TEXT,
-                group_name TEXT,
-                text TEXT,
-                num_likes INTEGER DEFAULT 0,
-                num_shared INTEGER DEFAULT 0,
-                num_comments INTEGER DEFAULT 0,
-                date TEXT,
-                link TEXT,
-                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+                Ключевое_слово TEXT,
+                Имя_группы TEXT,
+                Текст TEXT,
+                Количество_лайков INTEGER DEFAULT 0,
+                Количество_репостов INTEGER DEFAULT 0,
+                Количество_комментариев INTEGER DEFAULT 0,
+                Дата TEXT,
+                Ссылка TEXT UNIQUE,
+                Создано DATETIME DEFAULT CURRENT_TIMESTAMP
             );
             
-            CREATE INDEX IF NOT EXISTS idx_keyword ON posts(keyword);
-            CREATE INDEX IF NOT EXISTS idx_date ON posts(date);
+            CREATE INDEX IF NOT EXISTS idx_keyword ON posts(Ключевое_слово);
+            CREATE INDEX IF NOT EXISTS idx_date ON posts(Дата);
         ";
 
             createTableCommand.ExecuteNonQuery();
@@ -88,9 +88,9 @@ namespace json_to_sql
                         InsertPost(connection, post);
                         successCount++;
                     }
-                    catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // повтор
+                    catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // ошибка уникальности объекта
                     {
-                        // Дубликат post_id - пропускаем или обновляем
+                        // Дубликат проверяется по ссылке - пропускаем
                         Console.WriteLine($"Дубликат поста {post.Link}, пропускаем...");
                         errorCount++;
                     }
@@ -121,8 +121,8 @@ namespace json_to_sql
         {
             var command = connection.CreateCommand();
             command.CommandText = @"
-            INSERT OR IGNORE INTO posts 
-            (keyword, group_name, text, num_likes, num_shared, num_comments, date, link)
+            INSERT INTO posts 
+            (Ключевое_слово, Имя_группы, Текст, Количество_лайков, Количество_репостов, Количество_комментариев, Дата, Ссылка)
             VALUES ($keyword, $group_name, $text, $num_likes, $num_shared, $num_comments, $date, $link)
         ";
 
