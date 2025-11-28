@@ -1,5 +1,4 @@
 from typing import Dict
-from time import strftime
 from playwright.sync_api import Page, BrowserContext
 from config import Config
 from src.errors import SearchError, ParsePostError
@@ -168,14 +167,10 @@ class PostParser:
             year = data[-1]
         else:
             year = '2025'
-        if len(data) == 1:
-            month = strftime("%m")
-            year = strftime("%y")
-        else:
-            months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
-            for i, m in enumerate(months, start=1):
-                if data[1] == m:
-                    month = i
+        months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
+        for i, m in enumerate(months, start=1):
+            if data[1] == m:
+                month = i
 
         return f'{day}.{month}.{year}'
 
