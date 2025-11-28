@@ -14,7 +14,7 @@ class Authentication:
         page = context.new_page()
         page.goto('https://ok.ru/')
 
-        page.wait_for_event("close")
+        page.wait_for_event("close", timeout = 6000000)
 
         cookies = context.cookies()
         if not cookies:
