@@ -7,7 +7,8 @@ from src.auth import Authentication
 
 
 def main():
-    config = Config('математика', 7, False)
+	#указание ключевого слова, количества постов
+    config = Config('ключевое_слово', 7, False)
     with BrowserManager(config) as browser:
 
         if not os.path.exists('ok_cookies.json'):

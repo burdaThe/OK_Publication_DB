@@ -6,13 +6,14 @@ namespace json_to_sql
     public class JsonToSqliteImporter
     {
         private readonly string _connectionString;
-
-        public JsonToSqliteImporter(string databasePath = "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\SQL\\DBs\\posts.db")
+        // Путь сохранения/открытия выходного БД-файла
+        public JsonToSqliteImporter(string databasePath = "\\dbOutput\\posts.db")
         {
             _connectionString = $"Data Source={databasePath}";
             InitializeDatabase();
         }
 
+        // Инициализация/создание БД(если не существует)
         private void InitializeDatabase()
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -41,6 +42,7 @@ namespace json_to_sql
             Console.WriteLine("База данных инициализирована успешно!");
         }
 
+        // Десериализация постов из JSON в массив posts
         public bool ImportFromJsonFile(string jsonFilePath)
         {
             if (!File.Exists(jsonFilePath))
@@ -69,6 +71,7 @@ namespace json_to_sql
             }
         }
 
+        // Открытие БД и вставка постов через метод InsertPost + кэч дубликатов/ошибок
         private bool InsertPosts(List<SocialMediaPost> posts)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -116,7 +119,8 @@ namespace json_to_sql
                 return false;
             }
         }
-
+        
+        // Метод вставки поста в БД
         private void InsertPost(SqliteConnection connection, SocialMediaPost post)
         {
             var command = connection.CreateCommand();

@@ -382,11 +382,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\SQL\\C#\\json_to_sql\\json_to_sql.csproj",
+      "projectUniqueName": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\jsonToSql_sol\\json_to_sql.csproj",
       "projectName": "json_to_sql",
-      "projectPath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\SQL\\C#\\json_to_sql\\json_to_sql.csproj",
+      "projectPath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\jsonToSql_sol\\json_to_sql.csproj",
       "packagesPath": "C:\\Users\\srvow\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\SQL\\C#\\json_to_sql\\obj\\",
+      "outputPath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\jsonToSql_sol\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

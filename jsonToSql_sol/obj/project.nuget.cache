@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "P5aJgHpZjSQ=",
+  "dgSpecHash": "gIrdghyf+M8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\SQL\\C#\\json_to_sql\\json_to_sql.csproj",
+  "projectFilePath": "C:\\Users\\srvow\\source\\repos\\OK_Publication_DB\\jsonToSql_sol\\json_to_sql.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\srvow\\.nuget\\packages\\microsoft.data.sqlite\\9.0.10\\microsoft.data.sqlite.9.0.10.nupkg.sha512",
     "C:\\Users\\srvow\\.nuget\\packages\\microsoft.data.sqlite.core\\9.0.10\\microsoft.data.sqlite.core.9.0.10.nupkg.sha512",
