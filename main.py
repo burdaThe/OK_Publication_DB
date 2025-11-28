@@ -7,7 +7,7 @@ from src.auth import Authentication
 
 
 def main():
-    config = Config('математика', 7, True)
+    config = Config('математика', 7, False)
     with BrowserManager(config) as browser:
 
         if not os.path.exists('ok_cookies.json'):
