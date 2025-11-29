@@ -76,7 +76,7 @@
 
 ##### &nbsp;	1. **В config.py задать путь выходного json-файла**
 ```py
-output_path: str = '\jsons_output\output.json'
+output_path: str = '/jsons_output/output.json'
 ```
 ##### &nbsp;	2. **В main.py указать ключевое слово и количество постов**
 ```py
