@@ -7,7 +7,9 @@ from src.auth import Authentication
 
 
 def main():
-	#указание ключевого слова, количества постов
+
+    # указание ключевого слова, количества постов
+
     config = Config('ключевое_слово', 7, False)
     with BrowserManager(config) as browser:
 
