@@ -84,11 +84,11 @@ config = Config('ключевое_слово', количество постов
 ```
 ##### &nbsp;	3. **В JsonToSqliteImporter.cs задать путь сохранения выходного db-файла**
 ```cs
-public JsonToSqliteImporter(string databasePath = "\\dbOutput\\posts.db")
+public JsonToSqliteImporter(string databasePath = "\\db_output\\posts.db")
 ```
 ##### &nbsp;	4. **В Program.cs задать путь нахождения входного JSON-файла**
 ```cs
-importer.ImportFromJsonFile("\\jsonOutput\\output.json");
+importer.ImportFromJsonFile("\\json_output\\output.json");
 ```
 #### 3. **Запуск**
 
