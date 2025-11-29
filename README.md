@@ -37,25 +37,29 @@
 ### 🗒️Структура проекта
 
 ```
- OK\_Publication\_DB/
+ OK_Publication_DB/
    ├── src/
    │   ├── auth.py
    │   ├── browser.py
    │   ├── parser.py
    │   ├── storage.py
    │   └── errors.py
-   ├── json\_to\_sql/         
-   │   ├── json\_to\_sql.sln	# запуск импортера
+   ├── json_to_sql/
+   │   ├── SocialMediaPost.cs
    │   ├── JsonToSqliteImporter.cs
-   │   ├── Program.cs
-   │   └── SocialMediaPost.cs
-   ├── dbOutput/
+   │   ├── Program.cs     
+   │   ├── json_t_sql.sln	# решение c#
+   │   └── bin/
+   │       └── Debug/
+   │           └── net9.0/
+   │               └── json_to_sql.exe # запуск конвертера
+   ├── db_output/
    │   └── posts.db(*)
-   ├── jsonOutput/
+   ├── jsons_output/
    │   └── output.json(*)
    ├── main.py              # запуск парсера
    ├── config.py            # конфигурация парсера
-   └── ok\_cookies.json(*)
+   └── ok_cookies.json(*)
 
 (\*) - создаваемые/изменяемые файлы(их расположение тоже)
 ```
@@ -84,11 +88,11 @@ config = Config('ключевое_слово', количество постов
 ```
 ##### &nbsp;	3. **В JsonToSqliteImporter.cs задать путь сохранения выходного db-файла**
 ```cs
-public JsonToSqliteImporter(string databasePath = "\\db_output\\posts.db")
+public JsonToSqliteImporter(string databasePath = "..\\..\\..\\..\\db_output\\posts.db")
 ```
 ##### &nbsp;	4. **В Program.cs задать путь нахождения входного JSON-файла**
 ```cs
-importer.ImportFromJsonFile("\\json_output\\output.json");
+importer.ImportFromJsonFile("..\\..\\..\\..\\jsons_output\\output.json");
 ```
 #### 3. **Запуск**
 
@@ -96,9 +100,9 @@ importer.ImportFromJsonFile("\\json_output\\output.json");
 
 #####  	2. **Открывается страница входа в аккаунт OK.ru**
 
-#####  	3. **Необходимо залогиниться в свой аккаунт, дождаться полной загрузки ленты и только тогда закрыть браузер. Остается подождать выхода json-файла**
+#####  	3. **Необходимо залогиниться в свой аккаунт, дождаться полной загрузки ленты и только тогда закрыть браузер. Ждем выхода json-файла в jsons_output**
 
-#####  	4. **Запуск импортера из json-файла в db-файл через json\_to\_sql/json\_to\_sql.sln**
+#####  	4. **Запуск импортера из json-файла в db-файл через jsonToSql_sol/bin/Debug/net9.0/json_to_sql.exe**
 
 #####  	5. **Готово!**
 
