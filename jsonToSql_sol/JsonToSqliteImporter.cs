@@ -29,6 +29,7 @@ namespace json_to_sql
             CREATE TABLE IF NOT EXISTS keywords (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 keyword TEXT UNIQUE,
+                posts_num INTEGER DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -155,16 +156,22 @@ namespace json_to_sql
         {
             var keywordsCommand = connection.CreateCommand();
             keywordsCommand.CommandText = @"
-            INSERT INTO keywords (keyword) VALUES ($keyword);
+            INSERT OR IGNORE INTO keywords (keyword, posts_num) VALUES ($keyword, 0);
+            UPDATE keywords 
+            SET posts_num = (
+            SELECT COUNT(*) FROM posts 
+            WHERE keyword_id = keywords.id
+            )
+            WHERE keyword = $keyword;
             ";
             keywordsCommand.Parameters.AddWithValue("$keyword", post.keyword);
             keywordsCommand.ExecuteNonQuery();
 
             var authorsCommand = connection.CreateCommand();
             authorsCommand.CommandText = @"
-            INSERT INTO authors(name) VALUES ($name);
+            INSERT OR IGNORE INTO authors(name) VALUES ($name);
             ";
-            authorsCommand.Parameters.AddWithValue("$name", post.name ?? (object)DBNull.Value);
+            authorsCommand.Parameters.AddWithValue("$name", post.group_name ?? (object)DBNull.Value);
             authorsCommand.ExecuteNonQuery();
 
             var postsCommand = connection.CreateCommand();
@@ -177,7 +184,7 @@ namespace json_to_sql
             SELECT last_insert_rowid();
             ";
             postsCommand.Parameters.AddWithValue("$keyword", post.keyword);
-            postsCommand.Parameters.AddWithValue("$name", post.name ?? (object)DBNull.Value);
+            postsCommand.Parameters.AddWithValue("$name", post.group_name ?? (object)DBNull.Value);
             postsCommand.Parameters.AddWithValue("$text", post.text ?? (object)DBNull.Value);
             postsCommand.Parameters.AddWithValue("$date", post.date ?? (object)DBNull.Value);
             postsCommand.Parameters.AddWithValue("$link", post.link ?? (object)DBNull.Value);
@@ -190,10 +197,22 @@ namespace json_to_sql
             (post_id, likes_num, shares_num, comms_num) VALUES ($post_id, $likes_num, $shares_num, $comms_num);
             ";
             statisticsCommand.Parameters.AddWithValue("$post_id", postId);
-            statisticsCommand.Parameters.AddWithValue("$comms_num", post.numComments);
-            statisticsCommand.Parameters.AddWithValue("$likes_num", post.numLikes);
-            statisticsCommand.Parameters.AddWithValue("$shares_num", post.numShared);
+            statisticsCommand.Parameters.AddWithValue("$comms_num", post.num_comments);
+            statisticsCommand.Parameters.AddWithValue("$likes_num", post.num_likes);
+            statisticsCommand.Parameters.AddWithValue("$shares_num", post.num_shared);
             statisticsCommand.ExecuteNonQuery();
+
+            var updateCommand = connection.CreateCommand();
+            updateCommand.CommandText = @"
+            UPDATE keywords 
+            SET posts_num = (
+            SELECT COUNT(*) FROM posts 
+            WHERE keyword_id = keywords.id
+            )
+            WHERE keyword = $keyword;
+            ";
+            updateCommand.Parameters.AddWithValue("$keyword", post.keyword);
+            updateCommand.ExecuteNonQuery();
         }
     }
 }
