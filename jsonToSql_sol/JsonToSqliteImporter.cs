@@ -1,5 +1,10 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace json_to_sql
 {
@@ -21,21 +26,46 @@ namespace json_to_sql
 
             var createTableCommand = connection.CreateCommand();
             createTableCommand.CommandText = @"
+            CREATE TABLE IF NOT EXISTS keywords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                keyword TEXT UNIQUE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS authors (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS posts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Ключевое_слово TEXT,
-                Имя_группы TEXT,
-                Текст TEXT,
-                Количество_лайков INTEGER DEFAULT 0,
-                Количество_репостов INTEGER DEFAULT 0,
-                Количество_комментариев INTEGER DEFAULT 0,
-                Дата TEXT,
-                Ссылка TEXT UNIQUE,
-                Создано DATETIME DEFAULT CURRENT_TIMESTAMP
+                keyword_id INTEGER,
+                author_id INTEGER,
+                text TEXT,
+                published_at TEXT,
+                url TEXT UNIQUE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT posts_authors_fk
+                FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE CASCADE,
+                CONSTRAINT posts_keywords_fk
+                FOREIGN KEY (keyword_id) REFERENCES keywords (id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS statistics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_id INTEGER UNIQUE,
+                likes_num INTEGER DEFAULT 0,
+                shares_num INTEGER DEFAULT 0,
+                comms_num INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT statistics_posts_fk
+                FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE
             );
             
-            CREATE INDEX IF NOT EXISTS idx_keyword ON posts(Ключевое_слово);
-            CREATE INDEX IF NOT EXISTS idx_date ON posts(Дата);
+            CREATE INDEX IF NOT EXISTS idx_keyword ON keywords(keyword);
+            CREATE INDEX IF NOT EXISTS idx_author ON authors(name);
+            CREATE INDEX IF NOT EXISTS idx_date ON posts(published_at);
         ";
 
             createTableCommand.ExecuteNonQuery();
@@ -94,12 +124,12 @@ namespace json_to_sql
                     catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // ошибка уникальности объекта
                     {
                         // Дубликат проверяется по ссылке - пропускаем
-                        Console.WriteLine($"Дубликат поста {post.Link}, пропускаем...");
+                        Console.WriteLine($"Дубликат поста {post.link}, пропускаем...");
                         errorCount++;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Ошибка при вставке поста {post.Link}: {ex.Message}");
+                        Console.WriteLine($"Ошибка при вставке поста {post.link}: {ex.Message}");
                         errorCount++;
                     }
                 }
@@ -123,24 +153,47 @@ namespace json_to_sql
         // Метод вставки поста в БД
         private void InsertPost(SqliteConnection connection, SocialMediaPost post)
         {
-            var command = connection.CreateCommand();
-            command.CommandText = @"
-            INSERT INTO posts 
-            (Ключевое_слово, Имя_группы, Текст, Количество_лайков, Количество_репостов, Количество_комментариев, Дата, Ссылка)
-            VALUES ($keyword, $group_name, $text, $num_likes, $num_shared, $num_comments, $date, $link)
-        ";
+            var keywordsCommand = connection.CreateCommand();
+            keywordsCommand.CommandText = @"
+            INSERT INTO keywords (keyword) VALUES ($keyword);
+            ";
+            keywordsCommand.Parameters.AddWithValue("$keyword", post.keyword);
+            keywordsCommand.ExecuteNonQuery();
 
-            // Добавляем параметры
-            command.Parameters.AddWithValue("$keyword", post.Keyword);
-            command.Parameters.AddWithValue("$group_name", post.Group_name ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("$text", post.Text ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("$num_likes", post.Num_likes);
-            command.Parameters.AddWithValue("$num_shared", post.Num_shared);
-            command.Parameters.AddWithValue("$num_comments", post.Num_comments);
-            command.Parameters.AddWithValue("$date", post.Date ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("$link", post.Link ?? (object)DBNull.Value);
+            var authorsCommand = connection.CreateCommand();
+            authorsCommand.CommandText = @"
+            INSERT INTO authors(name) VALUES ($name);
+            ";
+            authorsCommand.Parameters.AddWithValue("$name", post.name ?? (object)DBNull.Value);
+            authorsCommand.ExecuteNonQuery();
 
-            command.ExecuteNonQuery();
+            var postsCommand = connection.CreateCommand();
+            postsCommand.CommandText = @"
+            INSERT INTO 
+            posts(keyword_id, author_id, text, published_at, url) VALUES (
+            (SELECT id FROM keywords WHERE keyword = $keyword),
+            (SELECT id FROM authors WHERE name = $name),
+            $text, $date, $link);
+            SELECT last_insert_rowid();
+            ";
+            postsCommand.Parameters.AddWithValue("$keyword", post.keyword);
+            postsCommand.Parameters.AddWithValue("$name", post.name ?? (object)DBNull.Value);
+            postsCommand.Parameters.AddWithValue("$text", post.text ?? (object)DBNull.Value);
+            postsCommand.Parameters.AddWithValue("$date", post.date ?? (object)DBNull.Value);
+            postsCommand.Parameters.AddWithValue("$link", post.link ?? (object)DBNull.Value);
+
+            var postId = Convert.ToInt64(postsCommand.ExecuteScalar());
+
+            var statisticsCommand = connection.CreateCommand();
+            statisticsCommand.CommandText = @"
+            INSERT INTO statistics
+            (post_id, likes_num, shares_num, comms_num) VALUES ($post_id, $likes_num, $shares_num, $comms_num);
+            ";
+            statisticsCommand.Parameters.AddWithValue("$post_id", postId);
+            statisticsCommand.Parameters.AddWithValue("$comms_num", post.numComments);
+            statisticsCommand.Parameters.AddWithValue("$likes_num", post.numLikes);
+            statisticsCommand.Parameters.AddWithValue("$shares_num", post.numShared);
+            statisticsCommand.ExecuteNonQuery();
         }
     }
 }

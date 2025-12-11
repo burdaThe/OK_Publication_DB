@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace json_to_sql
 {
-    //модель данных
+    // данные выводимые из JSON
     public class SocialMediaPost
     {
-        public string Keyword { get; set; } = "чай";
-        public string Group_name { get; set; }
-        public string Text { get; set; }
-        public int Num_likes { get; set; }
-        public int Num_shared { get; set; }
-        public int Num_comments { get; set; }
-        public string Date { get; set; }
-        public string Link { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string keyword { get; set; }
+        public string name { get; set; }
+        public string text { get; set; }
+        public int numLikes { get; set; }
+        public int numShared { get; set; }
+        public int numComments { get; set; }
+        public string date { get; set; }
+        public string link { get; set; }
+        public DateTime createdAt { get; set; } = DateTime.Now;
     }
 }
 
