@@ -9,6 +9,7 @@ import re
 class PostParser:
     def __init__(self, config: Config):
         self.config = config
+        self.num_read_links_attempts = 5
 
     def extract_links(self, page: Page) -> List[str]:
         """Extract post links."""
@@ -16,11 +17,12 @@ class PostParser:
         links = set()
         page.goto(self.config.search_url)
 
+        remaining_attepmts = self.num_read_links_attempts
         while True:
             if len(links) >= self.config.n_posts:
                 return list(links)[:self.config.n_posts]
             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(2000)
 
             html = page.content()
 
@@ -42,7 +44,11 @@ class PostParser:
                     return list(links)[:self.config.n_posts]
 
             if len(links) == 0:
-                raise SearchError('Search error. Found 0 posts. Search target might be too specific.')
+                if remaining_attepmts == 0:
+                    raise SearchError('Search error. Found 0 posts. Search target might be too specific.')
+                else:
+                    print(f'Failed to read links. Remaining attempts: {remaining_attepmts}')
+                    remaining_attepmts-=1
 
     @staticmethod
     def parse_post(link: str, context: BrowserContext) -> str:

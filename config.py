@@ -10,8 +10,10 @@ class Config:
     headless: bool = False
     timeout: int = 60000
     cookies_path: str = 'ok_cookies.json'
-	#путь нахождения выходного json-файла
-    output_path: str = '\jsons_output\output.json'
+
+    # путь нахождения выходного json-файла
+
+    output_path: str = 'jsons_output/output.json'
 
     def __post_init__(self):
         if self.n_posts < 1 or self.n_posts > 99999:

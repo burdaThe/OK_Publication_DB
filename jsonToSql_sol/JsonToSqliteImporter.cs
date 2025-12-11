@@ -12,7 +12,7 @@ namespace json_to_sql
     {
         private readonly string _connectionString;
         // Путь сохранения/открытия выходного БД-файла
-        public JsonToSqliteImporter(string databasePath = "\\dbOutput\\posts.db")
+        public JsonToSqliteImporter(string databasePath = "..\\..\\..\\..\\db_output\\posts.db")
         {
             _connectionString = $"Data Source={databasePath}";
             InitializeDatabase();
