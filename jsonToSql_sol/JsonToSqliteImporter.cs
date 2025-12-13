@@ -186,7 +186,14 @@ namespace json_to_sql
             postsCommand.Parameters.AddWithValue("$keyword", post.keyword);
             postsCommand.Parameters.AddWithValue("$name", post.group_name ?? (object)DBNull.Value);
             postsCommand.Parameters.AddWithValue("$text", post.text ?? (object)DBNull.Value);
-            postsCommand.Parameters.AddWithValue("$date", post.date ?? (object)DBNull.Value);
+            if (DateTime.TryParse(post.date, out DateTime parsedDate))
+            {
+                postsCommand.Parameters.AddWithValue("$date", parsedDate.ToString("yyyy-MM-dd"));
+            }
+            else
+            {
+                postsCommand.Parameters.AddWithValue("$date", post.date);
+            }
             postsCommand.Parameters.AddWithValue("$link", post.link ?? (object)DBNull.Value);
 
             var postId = Convert.ToInt64(postsCommand.ExecuteScalar());
